@@ -1,30 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Exam Hall Ticket</title>
+    <title>Hall Ticket - {{uid}}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; text-align: center; }
+        .ticket-container { background: white; width: 600px; margin: 50px auto; padding: 30px; border: 2px solid #333; border-radius: 10px; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .header { border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
+        .details { text-align: left; line-height: 2; margin-left: 20px; }
+        .qr-section { position: absolute; top: 100px; right: 40px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #777; }
+        .download-btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-bottom: 20px; transition: 0.3s; }
+        .download-btn:hover { background: #218838; }
+        @media print { .download-btn { display: none; } }
+    </style>
 </head>
-<body class="bg-gray-100 p-10">
-    <div class="max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden border-t-8 border-indigo-600">
-        <div class="p-8">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">HALL TICKET</h1>
-            
-            <div class="space-y-4 mb-8">
-                <p><strong>Name:</strong> {{name}}</p>
-                <p><strong>Roll No:</strong> {{roll}}</p>
-                <p><strong>Branch:</strong> {{branch}}</p>
-                <p><strong>Subjects:</strong> {{subjects}}</p>
-            </div>
+<body>
 
-            <div class="flex flex-col items-center border-t pt-6">
-                <img src="{{qr_url}}" alt="QR Verification" class="w-32 h-32">
-                <p class="text-xs text-gray-400 mt-2">Scan to Verify Candidate</p>
-            </div>
+    <br>
+    <button class="download-btn" onclick="downloadPDF()">Download Hall Ticket (PDF)</button>
 
-            <button onclick="window.print()" class="w-full mt-6 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700">
-                Print PDF
-            </button>
+    <div id="ticket" class="ticket-container">
+        <div class="header">
+            <h2>EXAMINATION HALL TICKET</h2>
+            <p>Annual Examination 2026</p>
+        </div>
+
+        <div class="details">
+            <p><strong>Candidate ID:</strong> {{uid}}</p>
+            <p><strong>Full Name:</strong> {{name}}</p>
+            <p><strong>Roll Number:</strong> {{roll}}</p>
+            <p><strong>Branch:</strong> {{branch}}</p>
+            <p><strong>Subjects:</strong> {{subjects}}</p>
+        </div>
+
+        <div class="qr-section">
+            <img src="{{qr_url}}" alt="QR Code" width="130">
+            <p style="font-size: 10px;">Scan to Verify</p>
+        </div>
+
+        <div class="footer">
+            <p>Note: Please bring this ticket and a valid ID to the examination center.</p>
+            <p>Generated on: <span id="date"></span></p>
         </div>
     </div>
+
+    <script>
+        // Set current date
+        document.getElementById('date').innerText = new Date().toLocaleDateString();
+
+        // PDF Download Function
+        function downloadPDF() {
+            const element = document.getElementById('ticket');
+            const opt = {
+                margin:       10,
+                filename:     'HallTicket_{{uid}}.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
 </body>
 </html>
